@@ -68,6 +68,13 @@
             -webkit-text-fill-color: transparent;
         }
 
+        .hamburger {
+            display: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--light);
+        }
+
         .nav-links {
             display: flex;
             gap: 2rem;
@@ -100,6 +107,58 @@
         .nav-links a:hover::after {
             width: 100%;
             left: 0;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -250px;
+            width: 250px;
+            height: 100%;
+            background: rgba(17, 24, 39, 0.95);
+            backdrop-filter: blur(12px);
+            padding: 4rem 2rem 2rem;
+            transition: left 0.3s ease;
+            z-index: 999;
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .sidebar .nav-links {
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .sidebar .nav-links a {
+            font-size: 1.1rem;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--light);
+        }
+
+        /* Overlay for sidebar */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 998;
+        }
+
+        .overlay.active {
+            display: block;
         }
 
         /* Hero Section */
@@ -746,19 +805,16 @@
 
         /* Mobile Responsive Styles */
         @media (max-width: 768px) {
+            .hamburger {
+                display: block;
+            }
+
+            .nav-links.desktop {
+                display: none;
+            }
+
             nav .container {
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .nav-links {
-                flex-direction: column;
-                gap: 1rem;
-                text-align: center;
-            }
-
-            .nav-links a {
-                font-size: 0.95rem;
+                justify-content: space-between;
             }
 
             .hero {
@@ -980,11 +1036,15 @@
     </style>
 </head>
 <body>
+    <!-- Overlay for sidebar -->
+    <div class="overlay" id="overlay"></div>
+
     <!-- Navigation -->
     <nav id="navbar">
         <div class="container">
             <div class="logo">Tousif Nawaz</div>
-            <ul class="nav-links">
+            <i class="fas fa-bars hamburger" id="hamburger"></i>
+            <ul class="nav-links desktop">
                 <li><a href="#home">Home</a></li>
                 <li><a href="#about">About</a></li>
                 <li><a href="#achievements">Achievements</a></li>
@@ -996,6 +1056,21 @@
             </ul>
         </div>
     </nav>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <i class="fas fa-times close-btn" id="close-btn"></i>
+        <ul class="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#achievements">Achievements</a></li>
+            <li><a href="#education">Education</a></li>
+            <li><a href="#skills">Skills</a></li>
+            <li><a href="#certifications">Certifications</a></li>
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </div>
 
     <!-- Hero Section -->
     <section class="hero" id="home">
@@ -1294,6 +1369,36 @@
             }, { threshold: 0.1 });
             items.forEach(item => observer.observe(item));
         }
+
+        // Sidebar toggle
+        const hamburger = document.getElementById('hamburger');
+        const sidebar = document.getElementById('sidebar');
+        const closeBtn = document.getElementById('close-btn');
+        const overlay = document.getElementById('overlay');
+
+        hamburger.addEventListener('click', () => {
+            sidebar.classList.add('open');
+            overlay.classList.add('active');
+        });
+
+        closeBtn.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+        });
+
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+        });
+
+        // Sidebar links close sidebar on click (for mobile navigation)
+        const sidebarLinks = sidebar.querySelectorAll('a');
+        sidebarLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+            });
+        });
 
         // Initialize EmailJS
         emailjs.init('3JK-9JNVwjLsKuHqS');
